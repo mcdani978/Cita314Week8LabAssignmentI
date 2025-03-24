@@ -62,6 +62,7 @@ public class SimpleHingeInteractable : XRSimpleInteractable
         base.OnSelectExited(args);
         grabHand = null;
         ChangeLayerMask(Grab_Layer);
+        ResetHinge();
     }
 
     private void TrackHand()
@@ -88,6 +89,8 @@ public class SimpleHingeInteractable : XRSimpleInteractable
     {
         ChangeLayerMask(Default_Layer);
     }
+
+    protected abstract void ResetHinge();
 
     private void ChangeLayerMask(string mask)
     {

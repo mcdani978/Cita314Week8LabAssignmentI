@@ -1,16 +1,21 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
-public class DoorInteractable : SimpleHingeInteractable
+public abstract class DoorInteractable : SimpleHingeInteractable
 {
     [SerializeField] combinationlock comboLock;
 
     [SerializeField] Transform doorObject;
 
     [SerializeField] Vector3 rotationLimits;
+
+    [SerializeField] Collider closedCollider;
+
+    private bool isClosed;
 
     private Transform startRotation;
 
@@ -62,7 +67,8 @@ public class DoorInteractable : SimpleHingeInteractable
         }
 
         private void CheckLimits()
-    {  
+    { 
+        isClosed = false;
         float localAngleX = transform.localEulerAngles.x;
 
         if(localAngleX >= 180)
@@ -73,11 +79,33 @@ public class DoorInteractable : SimpleHingeInteractable
             localAngleX <= StartAngleX - rotationLimits.x)
         {
             ReleaseHinge();
+
+        }
+    }
+
+    protected override void ResetHinge()
+    {
+        if(isClosed)
+        {
+            transform.localEulerAngles = startRotation;
+        }
+
+        else
+        {
             transform.localEulerAngles = new Vector3(
-                StartAngleX,
-                transform.localEulerAngles.y,
-                transform.localEulerAngles.z
-                );
+            StartAngleX,
+            transform.localEulerAngles.y,
+            transform.localEulerAngles.z
+        }
+
+    );
+
+        private void OnTriggerEnter(Collider other)
+    {
+        if(other == closedCollider)
+        {
+            isClosed= true;
+            ReleaseHinge();
         }
     }
 }
