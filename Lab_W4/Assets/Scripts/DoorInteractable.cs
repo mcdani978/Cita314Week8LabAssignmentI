@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
 
 public class DoorInteractable : SimpleHingeInteractable
 {
@@ -16,8 +17,9 @@ public class DoorInteractable : SimpleHingeInteractable
     private float StartAngleX;
 
     // Start is called before the first frame update
-    void Start()
+    protected override void Start() 
     {
+        base.Start();   
         startRotation = transform;
         startAngleX = startRotation.localEulerAngles.x;
         if(sartAngleX >= 180)
