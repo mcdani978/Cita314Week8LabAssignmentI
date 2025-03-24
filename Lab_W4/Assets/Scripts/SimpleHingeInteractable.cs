@@ -7,9 +7,21 @@ public class SimpleHingeInteractable : XRSimpleInteractable
 {
     private Transform grabHand;
 
+    [SerializeField] bool isLocked;
+
     void Start()
     {
         
+    }
+
+    public void LockHinge()
+    {
+        isLocked = true;
+    }
+
+    public void UnlockHinge()
+    {
+        isLocked = false;
     }
 
     // Update is called once per frame
@@ -23,8 +35,12 @@ public class SimpleHingeInteractable : XRSimpleInteractable
 
     protected override void OnSelectEntered(SelectEnterEventArgs args)
     {
-        base.OnSelectEntered(args);
-        grabHand = args.interactorObject.transform;
+        if (isLocked)
+        {
+            base.OnSelectEntered(args);
+            grabHand = args.interactorObject.transform;
+        }
+
     }
 
     protected override void OnSelectExited(SelectExitEventArgs args)

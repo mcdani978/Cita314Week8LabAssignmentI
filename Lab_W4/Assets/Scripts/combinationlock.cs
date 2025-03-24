@@ -4,11 +4,19 @@ using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using TMPro;
 using UnityEngine.UI;  // Make sure we are using the correct UI Image
-
+using UnityEngine.Events;
 // Remove using UnityEngine.UIElements;
 
 public class combinationlock : MonoBehaviour
 {
+    public UnityAction UnlockAction;
+
+    private void OnUnlocked() => UnlockAction?.Invoke();
+
+    public UnityAction LockAction;
+
+    private void OnLocked() => LockAction?.Invoke();
+
     [SerializeField] TMP_Text userInputText;
 
     [SerializeField] XrButtoninteractable[] comboButtons;
@@ -121,6 +129,7 @@ public class combinationlock : MonoBehaviour
     private void UnlockCombo()
     {
         isLocked = false;
+        OnUnlocked();
         lockedPanel.color = unlockedColor;
         lockedText.text = unlockedString;
 
@@ -133,6 +142,7 @@ public class combinationlock : MonoBehaviour
     private void LockCombo()
     {
         isLocked = true;
+        OnLocked();
         lockedPanel.color = lockedColor;
         lockedText.text = lockedString;
         infoText.text = startString;
