@@ -7,11 +7,23 @@ public class DoorInteractable : SimpleHingeInteractable
 {
     [SerializeField] combinationlock comboLock;
 
-    [SerializeField] private Transform doorObject;
+    [SerializeField] Transform doorObject;
+
+    [SerializeField] Vector3 rotationLimits;
+
+    private Transform startRotation;
+
+    private float StartAngleX;
 
     // Start is called before the first frame update
     void Start()
     {
+        startRotation = transform;
+        startAngleX = startRotation.localEulerAngles.x;
+        if(sartAngleX >= 180)
+        {
+            startAngleX -= 360;
+        }
         if(comboLock != null)
         {
             comboLock.UnlockAction += OnUnlocked;
@@ -40,6 +52,30 @@ public class DoorInteractable : SimpleHingeInteractable
                 transform.localEulerAngles.y,  // Ensures rotation follows the base hinge
                 doorObject.localEulerAngles.z
             );
+        }
+
+        if(isSelected)
+        {
+            CheckLimits();
+        }
+
+        private void CheckLimits()
+    {  
+        float localAngleX = transform.localEulerAngles.x;
+
+        if(localAngleX >= 180)
+        {
+            localAngleX -= 360;
+        }
+        if(localAngleX >= startAngleX + rotationLimits.x ||
+            localAngleX <= StartAngleX - rotationLimits.x)
+        {
+            ReleaseHinge();
+            transform.localEulerAngles = new Vector3(
+                StartAngleX,
+                transform.localEulerAngles.y,
+                transform.localEulerAngles.z
+                );
         }
     }
 }

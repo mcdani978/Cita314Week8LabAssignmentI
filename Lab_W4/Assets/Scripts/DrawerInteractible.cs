@@ -28,8 +28,9 @@ public class DrawerInteractible : XRGrabInteractable
     private Vector3 limitPositions;
 
     //Attributes
-    private const string defaultLayer = "Default";
-    private const string grabLayer = "Grab";
+    private const string Default_Layer = "Default";
+
+    private const string Grab_Layer = "Grab";
     private bool isGrabbed;
 
     //Events
@@ -77,7 +78,7 @@ public class DrawerInteractible : XRGrabInteractable
     protected override void OnSelectExited(SelectExitEventArgs args)
     {
         base.OnSelectExited(args);
-        ChangeLayerMask(grabLayer);
+        ChangeLayerMask(Grab_Layer);
         isGrabbed = false;
         transform.localPosition = drawerTransform.localPosition;
     }
