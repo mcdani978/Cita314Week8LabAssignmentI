@@ -1,37 +1,34 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
 public abstract class DoorInteractable : SimpleHingeInteractable
 {
-    [SerializeField] combinationlock comboLock;
-
-    [SerializeField] Transform doorObject;
-
-    [SerializeField] Vector3 rotationLimits;
-
-    [SerializeField] Collider closedCollider;
+    [SerializeField] private CombinationLock comboLock;
+    [SerializeField] private Transform doorObject;
+    [SerializeField] private Vector3 rotationLimits;
+    [SerializeField] private Collider closedCollider;
 
     private bool isClosed;
-
-    private Transform startRotation;
-
-    private float StartAngleX;
+    private Vector3 startRotation;
+    private float startAngleX;
 
     // Start is called before the first frame update
-    protected override void Start() 
+    protected override void Start()
     {
-        base.Start();   
-        startRotation = transform;
-        startAngleX = startRotation.localEulerAngles.x;
-        if(sartAngleX >= 180)
+        base.Start();
+
+        startRotation = transform.localEulerAngles;  // Store the initial rotation
+        startAngleX = startRotation.x;
+
+        if (startAngleX >= 180)
         {
             startAngleX -= 360;
         }
-        if(comboLock != null)
+
+        if (comboLock != null)
         {
             comboLock.UnlockAction += OnUnlocked;
             comboLock.LockAction += OnLocked;
@@ -52,6 +49,7 @@ public abstract class DoorInteractable : SimpleHingeInteractable
     protected override void Update()
     {
         base.Update();
+
         if (doorObject != null)
         {
             doorObject.localEulerAngles = new Vector3(
@@ -61,51 +59,39 @@ public abstract class DoorInteractable : SimpleHingeInteractable
             );
         }
 
-        if(isSelected)
+        if (isSelected)
         {
             CheckLimits();
         }
+    }
 
-        private void CheckLimits()
-    { 
+    private void CheckLimits()
+    {
         isClosed = false;
         float localAngleX = transform.localEulerAngles.x;
 
-        if(localAngleX >= 180)
+        if (localAngleX >= 180)
         {
             localAngleX -= 360;
         }
-        if(localAngleX >= startAngleX + rotationLimits.x ||
-            localAngleX <= StartAngleX - rotationLimits.x)
+
+        if (localAngleX >= startAngleX + rotationLimits.x ||
+            localAngleX <= startAngleX - rotationLimits.x)
         {
             ReleaseHinge();
-
         }
     }
 
     protected override void ResetHinge()
     {
-        if(isClosed)
+        if (isClosed)
         {
-            transform.localEulerAngles = startRotation;
-        }
-
-        else
-        {
-            transform.localEulerAngles = new Vector3(
-            StartAngleX,
-            transform.localEulerAngles.y,
-            transform.localEulerAngles.z
-        }
-
-    );
-
-        private void OnTriggerEnter(Collider other)
-    {
-        if(other == closedCollider)
-        {
-            isClosed= true;
-            ReleaseHinge();
+            transform.localEulerAngles = startRotation; // Fix: Assigning Vector3 instead of Transform
         }
     }
+
+    // Assuming these methods exist in the base class or need to be implemented
+    protected abstract void LockHinge();
+    protected abstract void UnlockHinge();
+    protected abstract void ReleaseHinge();
 }

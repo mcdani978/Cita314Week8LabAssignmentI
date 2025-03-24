@@ -4,36 +4,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
-
-public class DrawerInteractible : XRGrabInteractable
+public class DrawerInteractable : XRGrabInteractable
 {
-    //Serialized Fields
-    [SerializeField] 
-    Transform drawerTransform;
-    
-    [SerializeField] 
-    XRSocketInteractor keySocket;
+   
+    [SerializeField] private Transform drawerTransform;
+    [SerializeField] private XRSocketInteractor keySocket;
+    [SerializeField] private GameObject keyIndicatorLight;
+    [SerializeField] private bool isLocked;
+    [SerializeField] private Vector3 limitDistances = new Vector3(.02f, .02f, 0);
 
-    [SerializeField]
-    GameObject keyIndicatorLight;
-
-    [SerializeField] 
-    bool isLocked;
-
-    [SerializeField] 
-    private Vector3 limitDistances = new Vector3(.02f, .02f, 0);
-
-    //References
+  
     private Transform parentTransform;
     private Vector3 limitPositions;
 
-    //Attributes
+  
     private const string Default_Layer = "Default";
-
     private const string Grab_Layer = "Grab";
     private bool isGrabbed;
 
-    //Events
+
     void Start()
     {
         if (keySocket != null)
@@ -42,7 +31,7 @@ public class DrawerInteractible : XRGrabInteractable
             keySocket.selectExited.AddListener(OnDrawerLocked);
         }
 
-        parentTransform = transform.parent.transform;
+        parentTransform = transform.parent;
         limitPositions = drawerTransform.localPosition;
     }
 
@@ -55,10 +44,10 @@ public class DrawerInteractible : XRGrabInteractable
     private void OnDrawerUnlocked(SelectEnterEventArgs arg0)
     {
         isLocked = false;
-	if(keyIndicatorLight != null)
-{
-	keyIndicatorLight.SetActive(false);
-}
+        if (keyIndicatorLight != null)
+        {
+            keyIndicatorLight.SetActive(false);
+        }
         Debug.Log("DRAWER UNLOCKED");
     }
 
@@ -72,15 +61,15 @@ public class DrawerInteractible : XRGrabInteractable
         }
         else
         {
-            ChangeLayerMask(defaultLayer);
+            ChangeLayerMask(Default_Layer);
         }
     }
+
     protected override void OnSelectExited(SelectExitEventArgs args)
     {
         base.OnSelectExited(args);
         ChangeLayerMask(Grab_Layer);
         isGrabbed = false;
-        transform.localPosition = drawerTransform.localPosition;
     }
 
     void Update()
@@ -88,33 +77,31 @@ public class DrawerInteractible : XRGrabInteractable
         if (isGrabbed && drawerTransform != null)
         {
             drawerTransform.localPosition = new Vector3(
-                drawerTransform.localPosition.x, 
-                drawerTransform.localPosition.y, 
+                drawerTransform.localPosition.x,
+                drawerTransform.localPosition.y,
                 transform.localPosition.z
-                );
+            );
 
             CheckLimits();
         }
     }
 
-    //Private Methods
+ 
     private void CheckLimits()
     {
-        if (transform.localPosition.x >= limitPositions.x + limitDistances.x ||
-            transform.localPosition.x <= limitPositions.x - limitDistances.x)
+        Vector3 localPos = transform.localPosition;
+
+        if (localPos.x > limitPositions.x + limitDistances.x ||
+            localPos.x < limitPositions.x - limitDistances.x ||
+            localPos.y > limitPositions.y + limitDistances.y ||
+            localPos.y < limitPositions.y - limitDistances.y)
         {
-            ChangeLayerMask(defaultLayer);
-        }
-        else if (transform.localPosition.y >= limitPositions.y + limitDistances.y ||
-            transform.localPosition.y <= limitPositions.y - limitDistances.y)
-        {
-            ChangeLayerMask(defaultLayer);
+            ChangeLayerMask(Default_Layer);
         }
     }
 
     private void ChangeLayerMask(string mask)
     {
-        interactionLayers = InteractionLayerMask.GetMask(mask);
+        gameObject.layer = LayerMask.NameToLayer(mask);
     }
-
 }
