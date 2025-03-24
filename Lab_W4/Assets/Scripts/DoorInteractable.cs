@@ -69,17 +69,20 @@ public abstract class DoorInteractable : SimpleHingeInteractable
     {
         isClosed = false;
         float localAngleX = transform.localEulerAngles.x;
-
-        if (localAngleX >= 180)
-        {
-            localAngleX -= 360;
-        }
-
         if (localAngleX >= startAngleX + rotationLimits.x ||
             localAngleX <= startAngleX - rotationLimits.x)
         {
             ReleaseHinge();
         }
+    }
+
+    private float GetAngle(float angle)
+    {
+        if (localAngleX >= 180)
+        {
+            localAngleX -= 360;
+        }
+        return angle;
     }
 
     protected override void ResetHinge()
